@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual Environment
+venv/
+.env/
+.env.*  # e.g. .env.dev, .env.production
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Logs
+*.log
+
+# Test & Coverage
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+
+# Mypy / Pylint
+.mypy_cache/
+.pylint.d/
+
+# FastAPI Auto-generated
+*.sqlite3
+
+# Node (if frontend is included later)
+node_modules/
+dist/
+build/
+
+# JetBrains IDE (e.g. PyCharm)
+.idea/
