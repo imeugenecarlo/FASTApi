@@ -9,6 +9,7 @@ __pycache__/
 venv/
 .env/
 .env.*  # e.g. .env.dev, .env.production
+.env
 
 # VS Code
 .vscode/
