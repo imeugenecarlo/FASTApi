@@ -1,6 +1,6 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from pydantic import BaseModel
-from openai_utils import ask_chatgpt
+from groq_utils import ask_groq
 
 app = FastAPI()
 
@@ -9,5 +9,5 @@ class Message(BaseModel):
 
 @app.post("/chat")
 async def chat(message: Message):
-    response = ask_chatgpt(message.prompt)
-    return {"response": response}
+    reply = ask_groq(message.prompt)
+    return {"response": reply}
