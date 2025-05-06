@@ -6,7 +6,7 @@ __pycache__/
 *.so
 
 # Virtual Environment
-venv/
+.venv/
 .env/
 .env.*  # e.g. .env.dev, .env.production
 .env
