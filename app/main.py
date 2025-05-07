@@ -1,7 +1,12 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from groq_utils import ask_groq
+import logging
+from app.groq_utils import ask_groq  # Import your Groq logic
+from app.models import Message  # Import the Message model
+
+# Set up logging for better error tracking
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -14,13 +19,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class Message(BaseModel):
-    prompt: str
-
 @app.post("/chat")
 async def chat(message: Message):
     try:
+        # Call the ask_groq function to get a response
         reply = ask_groq(message.prompt)
         return {"response": reply}
+    except ValueError as ve:
+        logger.error(f"ValueError: {str(ve)}")  # Log the error for debugging
+        raise HTTPException(status_code=400, detail=f"Bad request: {str(ve)}")
     except Exception as e:
+        logger.error(f"Exception: {str(e)}")  # Log the error for debugging
         raise HTTPException(status_code=500, detail=f"Groq failed: {str(e)}")
+

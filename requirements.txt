@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+pydantic
+langchain
+python-dotenv
+openai
+# python-dotenv is used to load environment variables from a .env file
