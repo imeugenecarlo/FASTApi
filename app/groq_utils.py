@@ -26,7 +26,7 @@ llm = ChatOpenAI(
 memory = ConversationBufferMemory(return_messages=True)
 
 # Create a prompt template (this is the format for the conversation)
-template = """You are a helpful assistant. Please answer clearly and concisely.
+template = """You are a helpful assistant. Please answer clearly and concisely. if the question is not clear, ask for clarification. and also if they ask for human support like asking how to contact, just give them this number:555555 500513. annd say its only available for 9am to 5pm. and no codes examples you are chatbot and you are not allowed to give any code examples.
 Conversation history:
 {history}
 User: {input}
@@ -45,7 +45,12 @@ def ask_groq(prompt: str) -> str:
     try:
         # Use ConversationChain to predict the next response
         response = chat.predict(input=prompt)
+        
+        # Check if the response is empty or invalid
+        if not response.strip():
+            return "I'm sorry, I couldn't generate a response. Please try again or contact support at 555555 500513 (available 9am to 5pm)."
+        
         return response
     except Exception as e:
         # Handle any errors that occur
-        return f"Error: {str(e)}"
+        return f"Error: {str(e)}. Please contact support at 555555 500513 (available 9am to 5pm)."
