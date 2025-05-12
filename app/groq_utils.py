@@ -6,12 +6,23 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import ConversationChain
 from langchain_community.vectorstores import Weaviate
 from langchain.embeddings.openai import OpenAIEmbeddings
-import weaviate
+import weaviate 
+from weaviate.classes.init import Auth
 
 # Load environment variables from .env
 load_dotenv()
-
+#Local Weaviate connection
+# Initialize Weaviate client
 client = weaviate.connect_to_local(skip_init_checks=True)
+
+# Uncomment the following lines if you want to connect to Weaviate Cloud
+# weaviate_url = os.getenv("WEAVIATE_URL")
+# weaviate_api_key = os.getenv("WEAVIATE_API_KEY")
+
+# client = weaviate.connect_to_weaviate_cloud(
+#     cluster_url=weaviate_url,
+#     auth_credentials=Auth.api_key(weaviate_api_key),
+# )
 
 try:
     if client.is_ready():
