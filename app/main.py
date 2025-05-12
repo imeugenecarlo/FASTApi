@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 from app.groq_utils import ask_groq  # Import your Groq logic
 from app.models import Message  # Import the Message model
+from app.groq_utils import client
 
 # Set up logging for better error tracking
 logging.basicConfig(level=logging.INFO)
@@ -34,3 +35,13 @@ async def chat(message: Message):
         logger.error(f"Exception: {str(e)}")  # Log the error for debugging
         raise HTTPException(status_code=500, detail=f"Groq failed: {str(e)}")
 
+@app.get("/test-weaviate-connection")
+async def test_weaviate_connection():
+    try:
+        # Check if the client is connected to Weaviate
+        if client.is_ready():
+            return {"message": "Weaviate is connected and ready!"}
+        else:
+            return {"message": "Failed to connect to Weaviate."}
+    except Exception as e:
+        return {"error": str(e)}
