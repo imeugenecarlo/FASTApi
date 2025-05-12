@@ -4,4 +4,5 @@ pydantic
 langchain
 python-dotenv
 openai
+weaviate-client
 # python-dotenv is used to load environment variables from a .env file

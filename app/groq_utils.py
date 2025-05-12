@@ -26,7 +26,12 @@ llm = ChatOpenAI(
 memory = ConversationBufferMemory(return_messages=True)
 
 # Create a prompt template (this is the format for the conversation)
-template = """You are a helpful assistant. Please answer clearly and concisely. if the question is not clear, ask for clarification. and also if they ask for human support like asking how to contact, just give them this number:555555 500513. annd say its only available for 9am to 5pm. and no codes examples you are chatbot and you are not allowed to give any code examples.
+template = """You are a helpful assistant. Please answer clearly and concisely. 
+if the question is not clear, ask for clarification. and also if they ask for human support like asking how to contact,
+just give them this number:555555 500513.
+and say its only available for 9am to 5pm.
+and no codes examples you are chatbot 
+and you are not allowed to give any code examples.
 Conversation history:
 {history}
 User: {input}
@@ -54,3 +59,40 @@ def ask_groq(prompt: str) -> str:
     except Exception as e:
         # Handle any errors that occur
         return f"Error: {str(e)}. Please contact support at 555555 500513 (available 9am to 5pm)."
+> Entering new ConversationChain chain...
+Prompt after formatting:
+You are a helpful assistant. Please answer clearly and concisely. if the question is not clear, ask for clarification. and also if they ask for human support like asking how to contact, just give them this number:555555 500513. annd say its only available for 9am to 5pm. and no codes examples you are chatbot and you are not allowed to give any code examples.
+Conversation history:
+[]
+User: What is the capital of Sweden
+AI:
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+
+> Finished chain.
+INFO:     127.0.0.1:57231 - "POST /chat HTTP/1.1" 200 OK
+
+
+> Entering new ConversationChain chain...
+Prompt after formatting:
+You are a helpful assistant. Please answer clearly and concisely. if the question is not clear, ask for clarification. and also if they ask for human support like asking how to contact, just give them this number:555555 500513. annd say its only available for 9am to 5pm. and no codes examples you are chatbot and you are not allowed to give any code examples.
+Conversation history:
+[HumanMessage(content='What is the capital of Sweden', additional_kwargs={}, response_metadata={}), AIMessage(content='The capital of Sweden is Stockholm.', additional_kwargs={}, response_metadata={})]
+User: What is 9+10
+AI:
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+
+> Finished chain.
+INFO:     127.0.0.1:57231 - "POST /chat HTTP/1.1" 200 OK
+
+
+> Entering new ConversationChain chain...
+Prompt after formatting:
+You are a helpful assistant. Please answer clearly and concisely. if the question is not clear, ask for clarification. and also if they ask for human support like asking how to contact, just give them this number:555555 500513. annd say its only available for 9am to 5pm. and no codes examples you are chatbot and you are not allowed to give any code examples.
+Conversation history:
+[HumanMessage(content='What is the capital of Sweden', additional_kwargs={}, response_metadata={}), AIMessage(content='The capital of Sweden is Stockholm.', additional_kwargs={}, response_metadata={}), HumanMessage(content='What is 9+10', additional_kwargs={}, response_metadata={}), AIMessage(content='The answer to 9+10 is 19.', additional_kwargs={}, response_metadata={})]
+User: What was my question before the equation?
+AI:
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+
+> Finished chain.
+INFO:     127.0.0.1:57233 - "POST /chat HTTP/1.1" 200 OK
