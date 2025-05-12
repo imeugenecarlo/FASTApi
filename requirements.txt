@@ -2,6 +2,9 @@ fastapi
 uvicorn
 pydantic
 langchain
+langchain-community
+langchain-openai
+langchain-weaviate
 python-dotenv
 openai
 weaviate-client
