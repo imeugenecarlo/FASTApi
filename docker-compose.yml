@@ -1,11 +1,25 @@
-version: "3.9"
+version: '3.9'
+
 services:
+  weaviate:
+    image: semitechnologies/weaviate:latest
+    ports:
+      - "8080:8080"
+    environment:
+      QUERY_DEFAULTS: '20'
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: './data'
+      CLUSTER_HOSTNAME: 'weaviate'
+    volumes:
+      - ./data:/weaviate/data
+    restart: always
+
   fastapi:
-    build: .
-    container_name: fastapi_app
+    build:
+      context: .
     ports:
       - "8000:8000"
-    env_file:
-      - .env
-    volumes:
-      - .:/app  # Optional: live reload support if needed
+    depends_on:
+      - weaviate  # Ensure FastAPI starts after Weaviate
+    environment:
+      - WEAVIATE_URL=http://weaviate:8080  # Point FastAPI to Weaviate service in Docker

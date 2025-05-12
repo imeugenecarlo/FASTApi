@@ -3,10 +3,32 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 from app.groq_utils import ask_groq  # Import your Groq logic
 from app.models import Message  # Import the Message model
+import weaviate
 
 # Set up logging for better error tracking
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Set up Weaviate client (this will connect to the Docker container for Weaviate)
+client = weaviate.Client("http://weaviate:8080")
+
+# Create the class if not already created in Weaviate (run this function once)
+def create_schema():
+    client.schema.create_class({
+        "class": "Message",
+        "vectorizer": "text2vec-contextionary",  # Choose a vectorizer, can be changed
+        "properties": [
+            {
+                "name": "prompt",
+                "dataType": ["text"]
+            },
+            {
+                "name": "response",
+                "dataType": ["text"]
+            }
+        ]
+    })
+
 
 app = FastAPI()
 
