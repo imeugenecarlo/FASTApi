@@ -4,9 +4,29 @@ from langchain_community.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
 from langchain.chains import ConversationChain
+from langchain_community.vectorstores import Weaviate
+from langchain.embeddings.openai import OpenAIEmbeddings
+import weaviate
 
 # Load environment variables from .env
 load_dotenv()
+
+client = weaviate.connect_to_local(skip_init_checks=True)
+
+try:
+    if client.is_ready():
+        print("Weaviate is connected and ready.")
+    else:
+        print("Failed to connect to Weaviate.")
+except Exception as e:
+    print(f"Error connecting to Weaviate: {e}")
+
+#vectorstore = Weaviate(
+ #   client=client,
+  #  index_name="MyIndex",
+   # text_key="content",
+    #embedding=OpenAIEmbeddings()
+#)
 
 # Fetch the API key from environment variables
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
