@@ -1,11 +1,25 @@
 fastapi
 uvicorn
 pydantic
+# python-dotenv is used to load environment variables from a .env file
+python-dotenv
+
+# LangChain and ecosystem
 langchain
 langchain-core
-python-dotenv
+langchain-community
+langchain-openai
+langchain-weaviate
+
+# LLMs and embeddings
 openai
-weaviate-client
 sentence-transformers
+
+# Weaviate Cloud client
+weaviate-client
+
+# LangGraph (if you use it)
 langgraph
-# python-dotenv is used to load environment variables from a .env file
+
+# Optional: for logging and debugging
+httpx
