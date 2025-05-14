@@ -5,6 +5,7 @@ from langchain_core.messages import HumanMessage, SystemMessage, RemoveMessage
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import START, MessagesState, StateGraph
 from langchain.vectorstores import Weaviate
+from langchain_weaviate import WeaviateVectorStore
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
 import logging
@@ -98,7 +99,7 @@ def create_retrieval_chain():
         embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
         # Initialize the Weaviate vector store
-        vectorstore = Weaviate(
+        vectorstore = WeaviateVectorStore(
             client=client,
             index_name="SupportDocs",  # Ensure this matches your Weaviate class name
             text_key="text",

@@ -40,7 +40,8 @@ async def chat(message: Message):
     try:
         if retrieval_chain:
             # Attempt to use the Weaviate-based retrieval chain
-            reply = retrieval_chain.run({"query": message.prompt})
+            result = retrieval_chain.invoke({"query": message.prompt})
+            reply = result["result"]  # Extract the answer
         else:
             # Fall back to Groq logic if retrieval chain is unavailable
             logger.warning("Falling back to Groq logic due to unavailable Weaviate connection.")
@@ -54,6 +55,7 @@ from app.services.weaviate_client import get_weaviate_session
 
 @app.get("/health/weaviate")
 async def health_check_weaviate():
+    client = None
     try:
         client = get_weaviate_session()
         if client.is_ready():
@@ -62,6 +64,9 @@ async def health_check_weaviate():
             return {"status": "Weaviate is not ready"}
     except Exception as e:
         return {"status": "Weaviate connection failed", "error": str(e)}
+    finally:
+        if client:
+            client.close()
 
 # @app.post("/chat")
 # async def chat(message: Message):
