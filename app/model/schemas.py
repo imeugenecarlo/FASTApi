@@ -24,3 +24,9 @@ class QuerySchema(BaseModel):
 class HealthCheckResponse(BaseModel):
     status: str
     error: Optional[str] = None
+
+# Schema for chat messages
+class ChatMessageSchema(BaseModel):
+    sender: str
+    text: str
+    timestamp: str  # ISO format recommended

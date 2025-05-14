@@ -8,6 +8,9 @@ from langchain.vectorstores import Weaviate
 from langchain_weaviate import WeaviateVectorStore
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
+from langchain.memory import ConversationBufferMemory
+from langchain.prompts import PromptTemplate
+from langchain.chains import ConversationChain
 import logging
 from app.services.weaviate_client import get_weaviate_session
 
@@ -29,6 +32,27 @@ llm = ChatOpenAI(
     model="llama3-8b-8192",  # Specify the model to use
     base_url="https://api.groq.com/openai/v1",  # Groq's API URL
     api_key=GROQ_API_KEY,  # Provide the API key
+)
+
+# Set up conversation memory (global, shared for all users)
+memory = ConversationBufferMemory(return_messages=True)
+
+template = """You are a helpful assistant. Please answer clearly and concisely.
+if the question is not clear, ask for clarification. and also if they ask for human support like asking how to contact,
+just give them this number:555555 500513.
+and say its only available for 9am to 5pm.
+and no codes examples you are chatbot 
+and you are not allowed to give any code examples.
+Conversation history:
+{history}
+User: {input}
+AI:"""
+
+chat = ConversationChain(
+    llm=llm,
+    memory=memory,
+    prompt=PromptTemplate(input_variables=["history", "input"], template=template),
+    verbose=True,
 )
 
 # Define the workflow for managing conversation state
@@ -72,23 +96,17 @@ workflow.add_node("model", call_model)
 workflow.add_edge(START, "model")
 
 # Add simple in-memory checkpointer
-memory = MemorySaver()
-app = workflow.compile(checkpointer=memory)
+memory_saver = MemorySaver()
+app = workflow.compile(checkpointer=memory_saver)
 
 # Function to interact with Groq API via LangChain
 def ask_groq(prompt: str) -> str:
     try:
-        # Update the state with the user's input
-        state = memory.load_state()
-        state["messages"].append(HumanMessage(content=prompt))
-
-        # Run the workflow
-        result = app.run(state)
-        response_message = result["messages"][-1]  # Get the last message (model's response)
-
-        return response_message.content
+        response = chat.predict(input=prompt)
+        if not response.strip():
+            return "I'm sorry, I couldn't generate a response. Please try again or contact support at 555555 500513 (available 9am to 5pm)."
+        return response
     except Exception as e:
-        # Handle any errors that occur
         logger.error(f"Error in ask_groq: {e}")
         return f"Error: {str(e)}. Please contact support at 555555 500513 (available 9am to 5pm)."
 

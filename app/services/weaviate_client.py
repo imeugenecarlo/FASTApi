@@ -2,10 +2,11 @@ import os
 from dotenv import load_dotenv
 import logging
 import weaviate
+from datetime import datetime
+from sentence_transformers import SentenceTransformer
 
 # Load environment variables from the .env file
 load_dotenv()
-
 logger = logging.getLogger(__name__)
 
 def get_weaviate_session():
@@ -31,3 +32,49 @@ def is_weaviate_ready():
     except Exception as e:
         logger.error(f"Failed to connect to Weaviate: {e}")
         return False
+
+def create_chat_message_class(client):
+    schema = {
+        "class": "ChatMessage",
+        "vectorizer": "text2vec-openai",  # or your preferred vectorizer
+        "properties": [
+            {"name": "sender", "dataType": ["text"]},
+            {"name": "text", "dataType": ["text"]},
+            {"name": "timestamp", "dataType": ["date"]},
+        ],
+    }
+    if not client.schema.contains({"class": "ChatMessage"}):
+        client.schema.create_class(schema)
+
+def save_chat_message(client, sender, text):
+    model = SentenceTransformer("all-MiniLM-L6-v2")
+    embedding = model.encode(text).tolist()
+    data_obj = {
+        "sender": sender,
+        "text": text,
+        "timestamp": datetime.utcnow().isoformat()
+    }
+    client.collections.get("ChatMessage").data.insert(
+        properties=data_obj,
+        vector=embedding
+    )
+
+def retrieve_chat_messages(client, query, top_k=5):
+    """
+    Retrieve the most relevant chat messages from Weaviate using semantic search.
+    """
+    model = SentenceTransformer("all-MiniLM-L6-v2")
+    query_embedding = model.encode(query).tolist()
+    results = client.collections.get("ChatMessage").query.near_vector(
+        near_vector=query_embedding,
+        limit=top_k
+    )
+    # Each result is a WeaviateObject
+    return [
+        {
+            "text": obj.properties["text"],
+            "sender": obj.properties["sender"],
+            "timestamp": obj.properties["timestamp"]
+        }
+        for obj in results.objects
+    ]

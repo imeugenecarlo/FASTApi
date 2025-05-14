@@ -3,15 +3,14 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 from app.groq_utils import ask_groq  # Import Groq backup logic
 from app.models import Message  # Import the Message model
-from app.chains.support_chain import get_chain
+from app.chains.support_chain import get_chain  # Import the conversational retrieval chain with memory
 from app.groq_utils import create_retrieval_chain  # Import Weaviate-based retrieval chain
 from app.routes import weaviate_routes
+from app.services.weaviate_client import get_weaviate_session, save_chat_message
 
 # Set up logging for better error tracking
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-
 
 app = FastAPI()
 
@@ -27,31 +26,35 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize the retrieval chain
+# Initialize the conversational retrieval chain with memory
 try:
-    retrieval_chain = create_retrieval_chain()
+    retrieval_chain = get_chain()
 except Exception as e:
-    logger.error(f"Failed to initialize Weaviate retrieval chain: {e}")
+    logger.error(f"Failed to initialize support retrieval chain: {e}")
     retrieval_chain = None
 
 
 @app.post("/chat")
 async def chat(message: Message):
     try:
+        # Save user message
+        client = get_weaviate_session()
+        save_chat_message(client, "user", message.prompt)
+
         if retrieval_chain:
-            # Attempt to use the Weaviate-based retrieval chain
             result = retrieval_chain.invoke({"query": message.prompt})
-            reply = result["result"]  # Extract the answer
+            reply = result["result"]
         else:
-            # Fall back to Groq logic if retrieval chain is unavailable
-            logger.warning("Falling back to Groq logic due to unavailable Weaviate connection.")
             reply = ask_groq(message.prompt)
+
+        # Save AI reply
+        save_chat_message(client, "ai", reply)
+
         return {"response": reply}
     except Exception as e:
         logger.error(f"Error during chat processing: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-    
-from app.services.weaviate_client import get_weaviate_session
+
 
 @app.get("/health/weaviate")
 async def health_check_weaviate():
@@ -67,27 +70,3 @@ async def health_check_weaviate():
     finally:
         if client:
             client.close()
-
-# @app.post("/chat")
-# async def chat(message: Message):
-#     try:
-#         # Call the ask_groq function to get a response
-#         reply = ask_groq(message.prompt)
-#         return {"response": reply}
-#     except ValueError as ve:
-#         logger.error(f"ValueError: {str(ve)}")  # Log the error for debugging
-#         raise HTTPException(status_code=400, detail=f"Bad request: {str(ve)}")
-#     except Exception as e:
-#         logger.error(f"Exception: {str(e)}")  # Log the error for debugging
-#         raise HTTPException(status_code=500, detail=f"Groq failed: {str(e)}")
-
-#@app.get("/test-weaviate-connection")
-#async def test_weaviate_connection():
- #   try:
-        # Check if the client is connected to Weaviate
-  #      if client.is_ready():
-   #         return {"message": "Weaviate is connected and ready!"}
-    #    else:
-     #       return {"message": "Failed to connect to Weaviate."}
-    #except Exception as e:
-     #   return {"error": str(e)}
