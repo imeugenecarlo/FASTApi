@@ -2,10 +2,10 @@ fastapi
 uvicorn
 pydantic
 langchain
-langchain-community
-langchain-openai
-langchain-weaviate
+langchain-core
 python-dotenv
 openai
-weaviate-client>=4.0.0
+weaviate-client
+sentence-transformers
+langgraph
 # python-dotenv is used to load environment variables from a .env file
