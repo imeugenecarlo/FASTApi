@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import logging
 import weaviate
 from datetime import datetime
-from sentence_transformers import SentenceTransformer
+from langchain.embeddings import HuggingFaceEmbeddings
 
 # Load environment variables from the .env file
 load_dotenv()
@@ -13,7 +13,7 @@ def get_weaviate_session():
     """
     Returns a Weaviate client instance for interacting with the Weaviate Cloud.
     """
-    cluster_url = os.getenv("WEAVIATE_CLOUD_URL")  # e.g. "rAnD0mD1g1t5.something.weaviate.cloud"
+    cluster_url = os.getenv("WEAVIATE_URL")  # e.g. "rAnD0mD1g1t5.something.weaviate.cloud"
     api_key = os.getenv("WEAVIATE_API_KEY")        # Your Weaviate Cloud API key, if needed
 
     # If you need authentication, use weaviate.classes.init.Auth.api_key(api_key)
@@ -36,7 +36,6 @@ def is_weaviate_ready():
 def create_chat_message_class(client):
     schema = {
         "class": "ChatMessage",
-        "vectorizer": "text2vec-openai",  # or your preferred vectorizer
         "properties": [
             {"name": "sender", "dataType": ["text"]},
             {"name": "text", "dataType": ["text"]},
@@ -47,8 +46,8 @@ def create_chat_message_class(client):
         client.schema.create_class(schema)
 
 def save_chat_message(client, sender, text):
-    model = SentenceTransformer("all-MiniLM-L6-v2")
-    embedding = model.encode(text).tolist()
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    embedding = embeddings.embed_query(text)
     data_obj = {
         "sender": sender,
         "text": text,
@@ -63,8 +62,8 @@ def retrieve_chat_messages(client, query, top_k=5):
     """
     Retrieve the most relevant chat messages from Weaviate using semantic search.
     """
-    model = SentenceTransformer("all-MiniLM-L6-v2")
-    query_embedding = model.encode(query).tolist()
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    query_embedding = embeddings.embed_query(query)
     results = client.collections.get("ChatMessage").query.near_vector(
         near_vector=query_embedding,
         limit=top_k
