@@ -6,7 +6,7 @@ from app.models import Message  # Import the Message model
 from app.chains.support_chain import get_chain  # Import the conversational retrieval chain with memory
 from app.groq_utils import create_retrieval_chain  # Import Weaviate-based retrieval chain
 from app.routes import weaviate_routes
-from app.services.weaviate_client import get_weaviate_session, save_chat_message
+from app.services.weaviate_client import get_weaviate_session, save_chat_message, rag_pipeline
 
 # Set up logging for better error tracking
 logging.basicConfig(level=logging.INFO)
@@ -41,11 +41,8 @@ async def chat(message: Message):
         client = get_weaviate_session()
         save_chat_message(client, "user", message.prompt)
 
-        if retrieval_chain:
-            result = retrieval_chain.invoke({"query": message.prompt})
-            reply = result["result"]
-        else:
-            reply = ask_groq(message.prompt)
+        # Use the RAG pipeline for response generation
+        reply = rag_pipeline(client, message.prompt)
 
         # Save AI reply
         save_chat_message(client, "ai", reply)
