@@ -42,14 +42,29 @@ This repository contains a project built using [FastAPI](https://fastapi.tiangol
 
 ```
 /project-root
-├── app/
-│   ├── main.py          # Entry point of the application
-│   ├── routers/         # API route definitions
-│   ├── models/          # Data models
-│   ├── services/        # Business logic
-│   └── tests/           # Unit and integration tests
-├── requirements.txt     # Python dependencies
-└── README.md            # Project documentation
+├── docker-compose.yml          # Docker Compose configuration for services
+├── Dockerfile                  # Dockerfile for building the FastAPI app
+├── README.md                   # Project documentation
+├── requirements.txt            # Python dependencies
+├── app/                        # Main application folder
+│   ├── main.py                 # Entry point of the FastAPI application
+│   ├── models.py               # Pydantic models for request/response
+│   ├── chains/                 # Chain logic for conversational retrieval
+│   │   ├── support_chain.py    # Conversational retrieval chain logic
+│   ├── data/                   # Data files for the application
+│   │   └── faq.txt             # FAQ data for vector store
+│   ├── model/                  # Schema definitions
+│   │   └── schemas.py          # Pydantic schemas for API requests
+│   ├── routes/                 # API route definitions
+│   │   └── weaviate_routes.py  # Routes for Weaviate interactions
+│   ├── services/               # Business logic and service integrations
+│   │   ├── embedding_service.py # Embedding generation and vector store logic
+│   │   ├── weaviate_client.py  # Weaviate client and RAG pipeline
+│   │   ├── weaviate_utils.py   # Utility functions for Weaviate
+│   ├── utils/                  # Utility modules
+│   │   ├── logging_utils.py    # Centralized logging configuration
+│   │   ├── prompt_templates.py # Prompt templates for LLM interactions
+├── __pycache__/                # Compiled Python files (ignored in .gitignore)
 ```
 
 ## Contributing
