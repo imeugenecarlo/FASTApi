@@ -9,7 +9,7 @@ from app.routes import weaviate_routes
 from app.services.weaviate_client import get_weaviate_session, save_chat_message, rag_pipeline
 
 # Set up logging for better error tracking
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()

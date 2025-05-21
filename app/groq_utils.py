@@ -12,10 +12,12 @@ from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
 from langchain.chains import ConversationChain
 import logging
-from app.services.weaviate_client import get_weaviate_session
+from app.services.weaviate_session import get_weaviate_session
+from groq import Groq
+from app.utils.logging_utils import get_logger
 
-# Set up logging
-logger = logging.getLogger(__name__)
+# Initialize logger
+logger = get_logger(__name__)
 
 # Load environment variables from .env
 load_dotenv()
@@ -135,3 +137,22 @@ def create_retrieval_chain():
     except Exception as e:
         logger.error(f"Failed to create retrieval chain: {e}")
         return None
+
+def call_groq(prompt, model="llama3-70b-8192", temperature=0.2):
+    """
+    Centralized function to interact with the Groq API.
+    """
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        raise ValueError("GROQ_API_KEY not found in the environment variables")
+
+    groq_client = Groq(api_key=api_key)
+    try:
+        response = groq_client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=temperature
+        )
+        return response.choices[0].message.content
+    finally:
+        groq_client.close()

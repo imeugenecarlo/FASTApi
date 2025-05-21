@@ -1,12 +1,11 @@
 fastapi
-uvicorn==0.34.2
+uvicorn
 pydantic
 python-dotenv
 
 # LangChain and ecosystem
-langchain
-langchain-core==0.3.59
-langchain-community==0.3.24
+langchain-core
+langchain-community
 langchain-openai
 langchain-weaviate
 

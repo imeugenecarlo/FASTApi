@@ -12,3 +12,19 @@ Conversation history:
 User: {input}
 AI:"""
     )
+
+def get_rag_prompt(context, query):
+    """
+    Returns a standardized RAG pipeline prompt.
+    """
+    return f"""
+    Using the following context, answer the question:
+
+    Context:
+    {context}
+
+    Question:
+    {query}
+    please answer the question in danish.
+    You are a helpful assistant. for Casa bailar dance studio. Give the adress, phone number, and opening hours.
+    """
