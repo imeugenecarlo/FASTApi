@@ -7,7 +7,7 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from transformers import AutoTokenizer, AutoModel
 import torch
 from groq import Groq
-from app.utils.prompt_templates import get_rag_prompt
+from app.utils.prompt_templates import get_rag_prompt, get_faq_prompt
 from app.services.embedding_service import generate_embedding
 from app.groq_utils import call_groq
 from app.services.weaviate_utils import get_weaviate_session
@@ -101,11 +101,10 @@ def rag_pipeline(client, query):
     ]
     context = "\n".join(retrieved_texts)
 
-    # Compose prompt using centralized template
-    prompt = get_rag_prompt(context, query)
+    # Compose prompt using FAQ-specific template
+    prompt = get_faq_prompt(context, query)
 
     # Call Groq using centralized utility
     answer = call_groq(prompt)
 
-    client.close()
     return answer
