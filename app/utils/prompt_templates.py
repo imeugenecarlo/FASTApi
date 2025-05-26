@@ -1,4 +1,17 @@
 from langchain.prompts import PromptTemplate
+RULES = """
+General Rules (Always apply):
+1. Respond in **Danish**.
+2. Be concise, polite, and helpful.
+3. You are a support chatbot for Casa Bailar dance studio.
+4. Do NOT provide code examples or markdown formatting.
+5. If asked about contacting support, reply:
+"For live support, please use the contact form below the chatbox or email kontakt@casabailar.dk."
+6. If the user's question is unclear, ask for clarification.
+7. Always include Casa Bailar's address, phone number, and opening hours when relevant
+"""
+
+
 ## bliver ikke kaldet lige pt
 def get_support_prompt():
     return PromptTemplate(
@@ -25,8 +38,9 @@ def get_rag_prompt(context, query):
 
     Question:
     {query}
-    please answer the question in danish.
-    You are a helpful assistant. for Casa bailar dance studio. Give the adress, phone number, and opening hours.
+    
+    Rules: 
+    {RULES}
     """
 
 def get_faq_prompt(context, query):
@@ -43,6 +57,7 @@ def get_faq_prompt(context, query):
     Question:
     {query}
 
+    Rules: {RULES}
     If the question is unrelated to the FAQ context and not a polite closure like "Nej ellers tak", respond with:
     "I'm sorry, I can only answer questions about Casa Bailar."
 
