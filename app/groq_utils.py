@@ -37,16 +37,33 @@ llm = ChatOpenAI(
 # Set up conversation memory (global, shared for all users)
 memory = ConversationBufferMemory(return_messages=True)
 
-template = """You are a helpful assistant. Please answer clearly and concisely.
-if the question is not clear, ask for clarification. and also if they ask for human support like asking how to contact,
-just give them this number:555555 500513.
-and say its only available for 9am to 5pm.
-and no codes examples you are chatbot 
-and you are not allowed to give any code examples.
-Conversation history:
+template = """
+SYSTEM: You are a helpful AI chatbot. Follow these rules strictly:
+1. If the user's question isn't clear, ask for clarification.
+2. If the user asks for human support (“How do I contact…”, “I need help from an agent”), reply with:
+    “For live support, please use the contact form below the chatbox or email kontakt@casabailar.”
+3. Do NOT provide any code examples or use markdown formatting (no backticks, no `[text](url)` links).
+4. Always give clear, concise, relevant answers. Do not repeat the user's question.
+5. If you fail to generate an answer, return:
+    “I'm sorry, I couldn't generate a response. Please try again or contact support at 555-555-500513 (available 9 am - 5 pm).”
+
+CONVERSATION HISTORY:
 {history}
-User: {input}
-AI:"""
+
+USER: {input}
+AI:
+"""
+
+# You are a helpful assistant. Please answer clearly and concisely.
+# if the question is not clear, ask for clarification. and also if they ask for human support like asking how to contact,
+# just give them this number:555555 500513.
+# and say its only available for 9am to 5pm.
+# and no codes examples you are chatbot 
+# and you are not allowed to give any code examples.
+# Conversation history:
+# {history}
+# User: {input}
+# AI:"""
 
 chat = ConversationChain(
     llm=llm,
