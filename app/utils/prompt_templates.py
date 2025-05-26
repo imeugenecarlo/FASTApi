@@ -1,5 +1,5 @@
 from langchain.prompts import PromptTemplate
-
+## bliver ikke kaldet lige pt
 def get_support_prompt():
     return PromptTemplate(
         input_variables=["history", "input"],
