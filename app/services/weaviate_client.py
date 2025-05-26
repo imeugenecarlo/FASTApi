@@ -3,45 +3,26 @@ from dotenv import load_dotenv
 import logging
 import weaviate
 from datetime import datetime
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from transformers import AutoTokenizer, AutoModel
 import torch
 from groq import Groq
+from app.utils.prompt_templates import get_rag_prompt, get_faq_prompt
+from app.services.embedding_service import generate_embedding
+from app.groq_utils import call_groq
+from app.services.weaviate_utils import get_weaviate_session
+from app.utils.logging_utils import get_logger
+
+# Configure logging
+logging.basicConfig(level=logging.WARNING)
 
 # Load environment variables from the .env file
 load_dotenv()
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 # Load the Snowflake embedding model
 tokenizer = AutoTokenizer.from_pretrained("Snowflake/snowflake-arctic-embed-l-v2.0")
 model = AutoModel.from_pretrained("Snowflake/snowflake-arctic-embed-l-v2.0")
-
-def generate_embedding(text):
-    """
-    Generate embeddings using the Snowflake embedding model.
-    """
-    inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True)
-    with torch.no_grad():
-        outputs = model(**inputs)
-    # Use the mean pooling of the last hidden state as the embedding
-    embeddings = outputs.last_hidden_state.mean(dim=1).squeeze().tolist()
-    return embeddings
-
-def get_weaviate_session():
-    """
-    Returns a Weaviate client instance for interacting with the Weaviate Cloud.
-    """
-    cluster_url = os.getenv("WEAVIATE_URL")  # e.g. "rAnD0mD1g1t5.something.weaviate.cloud"
-    api_key = os.getenv("WEAVIATE_API_KEY")        # Your Weaviate Cloud API key, if needed
-
-    # If you need authentication, use weaviate.classes.init.Auth.api_key(api_key)
-    auth = weaviate.auth.AuthApiKey(api_key) if api_key else None
-
-    client = weaviate.connect_to_weaviate_cloud(
-        cluster_url=cluster_url,
-        auth_credentials=auth,
-    )
-    return client
 
 def is_weaviate_ready():
     session = get_weaviate_session()
@@ -120,29 +101,10 @@ def rag_pipeline(client, query):
     ]
     context = "\n".join(retrieved_texts)
 
-    # Compose prompt
-    prompt = f"""
-    Using the following context, answer the question:
+    # Compose prompt using FAQ-specific template
+    prompt = get_faq_prompt(context, query)
 
-    Context:
-    {context}
+    # Call Groq using centralized utility
+    answer = call_groq(prompt)
 
-    Question:
-    {query}
-    please answer the question in danish.
-    You are a helpful assistant. for Casa bailar dance studio. Give the adress, phone number, and opening hours.
-    """
-
-    # Call Groq (you can also call it via requests.post if not using SDK)
-    groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-    response = groq_client.chat.completions.create(
-        model="llama3-70b-8192",
-        messages=[
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.2
-    )
-
-    answer = response.choices[0].message.content
-    groq_client.close()
     return answer

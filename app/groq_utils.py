@@ -1,21 +1,22 @@
 import os
 from dotenv import load_dotenv
-from langchain.chat_models import ChatOpenAI
+from langchain_community.chat_models import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage, RemoveMessage
+from langchain_core.runnables.history import RunnableWithMessageHistory
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import START, MessagesState, StateGraph
-from langchain.vectorstores import Weaviate
-from langchain_weaviate import WeaviateVectorStore
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import Weaviate
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
-from langchain.chains import ConversationChain
 import logging
-from app.services.weaviate_client import get_weaviate_session
+from app.services.weaviate_session import get_weaviate_session
+from groq import Groq
+from app.utils.logging_utils import get_logger
 
-# Set up logging
-logger = logging.getLogger(__name__)
+# Initialize logger
+logger = get_logger(__name__)
 
 # Load environment variables from .env
 load_dotenv()
@@ -65,9 +66,15 @@ AI:
 # User: {input}
 # AI:"""
 
-chat = ConversationChain(
-    llm=llm,
-    memory=memory,
+# Define a function to retrieve session history
+def get_session_history(memory):
+    return memory.load_memory_variables({}).get("history", [])
+
+# Initialize the RunnableWithMessageHistory
+chat = RunnableWithMessageHistory(
+    runnable=llm,  # Pass the ChatOpenAI model as the runnable
+    memory=memory,  # Use the conversation memory
+    get_session_history=lambda: get_session_history(memory),  # Retrieve session history
     prompt=PromptTemplate(input_variables=["history", "input"], template=template),
     verbose=True,
 )
@@ -119,7 +126,7 @@ app = workflow.compile(checkpointer=memory_saver)
 # Function to interact with Groq API via LangChain
 def ask_groq(prompt: str) -> str:
     try:
-        response = chat.predict(input=prompt)
+        response = chat.invoke({"input": prompt})
         if not response.strip():
             return "I'm sorry, I couldn't generate a response. Please try again or contact support at 555555 500513 (available 9am to 5pm)."
         return response
@@ -134,7 +141,7 @@ def create_retrieval_chain():
         embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
         # Initialize the Weaviate vector store
-        vectorstore = WeaviateVectorStore(
+        vectorstore = Weaviate(
             client=client,
             index_name="SupportDocs",  # Ensure this matches your Weaviate class name
             text_key="text",
@@ -152,3 +159,22 @@ def create_retrieval_chain():
     except Exception as e:
         logger.error(f"Failed to create retrieval chain: {e}")
         return None
+
+def call_groq(prompt, model="llama3-70b-8192", temperature=0.2):
+    """
+    Centralized function to interact with the Groq API.
+    """
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        raise ValueError("GROQ_API_KEY not found in the environment variables")
+
+    groq_client = Groq(api_key=api_key)
+    try:
+        response = groq_client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=temperature
+        )
+        return response.choices[0].message.content
+    finally:
+        groq_client.close()

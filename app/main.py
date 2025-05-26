@@ -9,7 +9,7 @@ from app.routes import weaviate_routes
 from app.services.weaviate_client import get_weaviate_session, save_chat_message, rag_pipeline
 
 # Set up logging for better error tracking
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
@@ -27,6 +27,7 @@ app.add_middleware(
 )
 
 # Initialize the conversational retrieval chain with memory
+#den er ikke implementeret ordentlig, og supportdocs schema har ikke noget data. ;)
 try:
     retrieval_chain = get_chain()
 except Exception as e:
