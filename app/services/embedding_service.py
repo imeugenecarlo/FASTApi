@@ -1,6 +1,6 @@
 import os
 from langchain_community.vectorstores import Weaviate
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from app.services.weaviate_utils import get_weaviate_session
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter

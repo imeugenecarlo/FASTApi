@@ -25,9 +25,9 @@ def get_chain():
 
     chain = RunnableWithMessageHistory(
         llm=ChatOpenAI(
-            model="llama3-8b-8192",  # Specify the model to use
-            base_url="https://api.groq.com/openai/v1",  # Groq's API URL
-            api_key=GROQ_API_KEY,  # Provide the API key
+            model="llama3-8b-8192",
+            base_url="https://api.groq.com/openai/v1",
+            api_key=GROQ_API_KEY,
         ),
         retriever=retriever,
         memory=memory,
