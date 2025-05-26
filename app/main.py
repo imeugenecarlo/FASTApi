@@ -27,6 +27,7 @@ app.add_middleware(
 )
 
 # Initialize the conversational retrieval chain with memory
+#den er ikke implementeret ordentlig, og supportdocs schema har ikke noget data. ;)
 try:
     retrieval_chain = get_chain()
 except Exception as e:
