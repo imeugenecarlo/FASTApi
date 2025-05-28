@@ -13,7 +13,7 @@ langchain-weaviate
 openai==1.78.1
 sentence-transformers
 
-# Weaviate Cloud client
+# Weaviate Cloud clientfir
 weaviate-client
 
 # LangGraph (if you use it)
