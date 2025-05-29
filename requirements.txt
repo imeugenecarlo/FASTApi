@@ -22,4 +22,3 @@ langgraph
 # Optional: for logging and debugging
 httpx
 
-numpy
