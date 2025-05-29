@@ -12,6 +12,7 @@ langchain-openai
 # LLMs and embeddings
 openai==1.78.1
 sentence-transformers
+groq
 
 # Weaviate Cloud clientfir
 weaviate-client
