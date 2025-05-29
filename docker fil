@@ -21,5 +21,5 @@ COPY . .
 # Expose port (FastAPI default is 8000)
 EXPOSE 8000
 
-# Start FastAPI using uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Use Railway's PORT environment variable
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "${PORT:-8000}"]
