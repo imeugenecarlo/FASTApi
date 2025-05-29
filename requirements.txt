@@ -8,6 +8,7 @@ langchain-core
 langchain-community
 langchain-weaviate
 langchain-openai
+langchain-huggingface  # Added this line
 
 # LLMs and embeddings
 openai==1.78.1
