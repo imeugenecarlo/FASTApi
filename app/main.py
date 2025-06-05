@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 from app.groq_utils import ask_groq  # Import Groq backup logic
 from app.models import Message  # Import the Message model
-from app.chains.support_chain import get_chain  # Import the conversational retrieval chain with memory
-from app.groq_utils import create_retrieval_chain  # Import Weaviate-based retrieval chain
+#from app.chains.support_chain import get_chain  # Import the conversational retrieval chain with memory
+#from app.groq_utils import create_retrieval_chain  # Import Weaviate-based retrieval chain
 from app.routes import weaviate_routes
 from app.services.weaviate_client import get_weaviate_session, save_chat_message, rag_pipeline
 
@@ -28,11 +28,11 @@ app.add_middleware(
 
 # Initialize the conversational retrieval chain with memory
 #den er ikke implementeret ordentlig, og supportdocs schema har ikke noget data. ;)
-try:
-    retrieval_chain = get_chain()
-except Exception as e:
-    logger.error(f"Failed to initialize support retrieval chain: {e}")
-    retrieval_chain = None
+# try:
+#     retrieval_chain = get_chain()
+# except Exception as e:
+#     logger.error(f"Failed to initialize support retrieval chain: {e}")
+#     retrieval_chain = None
 
 
 @app.post("/chat")
@@ -50,8 +50,15 @@ async def chat(message: Message):
 
         return {"response": reply}
     except Exception as e:
-        logger.error(f"Error during chat processing: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Weaviate connection failed, using fallback: {e}")
+
+        # Fallback logic using ask_groq
+        try:
+            reply = ask_groq(message.prompt, history=[])
+            return {"response": reply}
+        except Exception as fallback_error:
+            logger.error(f"Fallback failed: {fallback_error}")
+            raise HTTPException(status_code=500, detail="Both primary and fallback methods failed.")
 
 
 @app.get("/health/weaviate")

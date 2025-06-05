@@ -9,6 +9,7 @@ from langchain_community.vectorstores import Weaviate
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
 from langchain.memory import ConversationBufferMemory
+from langchain.chains import ConversationChain
 from langchain.prompts import PromptTemplate
 import logging
 from app.services.weaviate_session import get_weaviate_session
@@ -124,15 +125,61 @@ memory_saver = MemorySaver()
 app = workflow.compile(checkpointer=memory_saver)
 
 # Function to interact with Groq API via LangChain
-def ask_groq(prompt: str) -> str:
+def ask_groq(prompt: str, history: list[str]) -> str:
     try:
-        response = chat.invoke({"input": prompt})
-        if not response.strip():
-            return "I'm sorry, I couldn't generate a response. Please try again or contact support at 555555 500513 (available 9am to 5pm)."
+        # Define the template
+        template = """
+SYSTEM: You are a helpful AI chatbot. Follow these rules strictly:
+1. If the user's question isn't clear, ask for clarification.
+2. If the user asks for human support (“How do I contact…”, “I need help from an agent”), reply with:
+    “For live support, please use the contact form below the chatbox or email kontakt@casabailar.”
+3. Do NOT provide any code examples or use markdown formatting (no backticks, no [text](url) links).
+4. Always give clear, concise, relevant answers. Do not repeat the user's question.
+5. If you fail to generate an answer, return:
+    “I'm sorry, I couldn't generate a response. Please try again or contact support at 555-555-500513 (available 9 am - 5 pm).”
+6. Remember to say that you can't get connection to your database to give a proper answer. Only use the fallback answer if you can't get a proper answer.
+7. Always reply in Danish. You are a Danish chatbot. If the user asks in English, reply in English.
+
+CONVERSATION HISTORY:
+{history}
+
+USER: {input}
+AI:
+"""
+
+        # Format the conversation history
+        formatted_history = [{"role": "user" if i % 2 == 0 else "assistant", "content": msg} for i, msg in enumerate(history)]
+
+        # Save the formatted history into the global memory
+        for message in formatted_history:
+            memory.save_context({"input": message["content"]}, {})
+
+        # Create the prompt template
+        prompt_template = PromptTemplate(
+            input_variables=["history", "input"],
+            template=template.strip()
+        )
+
+        # Create the conversation chain using the global memory
+        conversation_chain = ConversationChain(
+            llm=llm,  # Use the globally initialized ChatOpenAI model
+            memory=memory,  # Use the global memory instance
+            prompt=prompt_template,
+            verbose=False,
+        )
+
+        # Call the conversation chain with the current user input
+        response = conversation_chain.predict(input=prompt)
+
         return response
+
     except Exception as e:
-        logger.error(f"Error in ask_groq: {e}")
-        return f"Error: {str(e)}. Please contact support at 555555 500513 (available 9am to 5pm)."
+        logger.error(f"Groq fallback failed: {e}")
+        return (
+            "I'm sorry, I couldn't generate a response. "
+            "Prøv igen eller ring til for menneskelig hjælp 555-555-500513 (åbent man-tors og lørdag 9 - 17 pm)."
+        )
+
 
 # Function to create a retrieval chain using Weaviate
 def create_retrieval_chain():

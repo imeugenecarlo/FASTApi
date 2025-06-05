@@ -7,31 +7,31 @@ from dotenv import load_dotenv
 import os
 
 # Load environment variables from .env
-load_dotenv()
+# load_dotenv()
 
 # Fetch the API key from environment variables
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+# GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-def get_chain():
-    vectorstore = create_vectorstore(
-        file_path="app/data/faq.txt",
-        index_name="SupportDocs",
-        chunk_size=500,
-        chunk_overlap=50
-    )
-    retriever = vectorstore.as_retriever()
+# def get_chain():
+#     vectorstore = create_vectorstore(
+#         file_path="app/data/faq.txt",
+#         index_name="SupportDocs",
+#         chunk_size=500,
+#         chunk_overlap=50
+#     )
+#     retriever = vectorstore.as_retriever()
 
-    memory = ConversationBufferMemory(return_messages=True)
+#     memory = ConversationBufferMemory(return_messages=True)
 
-    chain = RunnableWithMessageHistory(
-        llm=ChatOpenAI(
-            model="llama3-8b-8192",
-            base_url="https://api.groq.com/openai/v1",
-            api_key=GROQ_API_KEY,
-        ),
-        retriever=retriever,
-        memory=memory,
-        condense_question_prompt=get_support_prompt()
-    )
+#     chain = RunnableWithMessageHistory(
+#         llm=ChatOpenAI(
+#             model="llama3-8b-8192",
+#             base_url="https://api.groq.com/openai/v1",
+#             api_key=GROQ_API_KEY,
+#         ),
+#         retriever=retriever,
+#         memory=memory,
+#         condense_question_prompt=get_support_prompt()
+#     )
 
-    return chain
+#     return chain
