@@ -5,6 +5,11 @@ services:
     build: .
     ports:
       - "8000:8000"
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - WEAVIATE_URL=${WEAVIATE_URL}
+      - WEAVIATE_API_KEY=${WEAVIATE_API_KEY}
+      - WEAVIATE_GRPC_URL=${WEAVIATE_GRPC_URL}
     env_file:
       - .env
     depends_on:
