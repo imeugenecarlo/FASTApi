@@ -1,4 +1,5 @@
 fastapi==0.115.13
+fastapi[standard]==0.115.13
 groq==0.28.0
 langchain==0.3.25
 langchain_community==0.3.25
@@ -10,5 +11,5 @@ python-dotenv==1.1.0
 torch==2.7.0
 transformers==4.51.3
 weaviate_client==4.14.4
-
+openai==1.88.0
 uvicorn==0.34.2

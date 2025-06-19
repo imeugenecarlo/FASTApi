@@ -1,0 +1,30 @@
+
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.so
+
+
+
+# Git
+.git/
+.gitignore
+
+# Editor/IDE settings
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker-related
+Dockerfile
+docker-compose.yml
+
+# Logs and debug
+*.log
+
+# Misc
+*.bak
