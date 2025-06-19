@@ -1,26 +1,14 @@
-fastapi
-uvicorn
-pydantic
-python-dotenv
+fastapi==0.115.13
+groq==0.28.0
+langchain==0.3.25
+langchain_community==0.3.25
+langchain_core==0.3.65
+langchain_huggingface==0.3.0
+langgraph==0.4.8
+pydantic==2.11.7
+python-dotenv==1.1.0
+torch==2.7.0
+transformers==4.51.3
+weaviate_client==4.14.4
 
-# LangChain and ecosystem
-langchain-core
-langchain-community
-langchain-weaviate
-langchain-openai
-langchain-huggingface  # Added this line
-
-# LLMs and embeddings
-openai==1.78.1
-sentence-transformers
-groq
-
-# Weaviate Cloud clientfir
-weaviate-client
-
-# LangGraph (if you use it)
-langgraph
-
-# Optional: for logging and debugging
-httpx
-
+uvicorn==0.34.2
