@@ -61,7 +61,7 @@ Bruger: Sælger I dansesko?
 AI: Beklager, jeg kan kun besvare spørgsmål om Casa Bailar.
 
 Bruger: Nej ellers tak.
-AI: Tak for din tid! Hav en god dag 🌞
+AI: Tak for din tid! Hav en god dag!
 
 Kontekst:
 {context}
@@ -69,6 +69,7 @@ Kontekst:
 Spørgsmål:
 {query}
 
+Regler:
 {RULES}
 
 Hvis spørgsmålet ikke vedrører FAQ-konteksten og ikke er en høflig afslutning, svar:
