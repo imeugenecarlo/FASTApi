@@ -4,8 +4,11 @@ __pycache__/
 *.py[cod]
 *.so
 
-
-
+# Python virtual environments
+venv/
+env/
+.env
+.venv
 # Git
 .git/
 .gitignore
