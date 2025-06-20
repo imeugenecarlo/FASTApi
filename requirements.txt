@@ -13,3 +13,4 @@ transformers==4.51.3
 weaviate_client==4.14.4
 openai==1.88.0
 uvicorn==0.34.2
+sentence-transformers==2.2.2
