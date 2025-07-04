@@ -2,6 +2,14 @@
 
 This repository contains a project built using [FastAPI](https://fastapi.tiangolo.com/), a modern, fast (high-performance) web framework for building APIs with Python.
 
+## About the Project
+
+This backend is part of our **final exam project**, which is a **support chatbot** designed to help users with frequently asked questions.  
+The backend handles API logic, vector search using Weaviate, and communication with a large language model.
+
+The frontend for this project was developed in collaboration with my teammate and friend as part of our group with **Lasse**. You can find the frontend repository here:  
+🔗 [CasaBotFrontEnd (by LasseHindsberg)](https://github.com/LasseHindsberg/CasaBotFrontEnd)
+
 ## Features
 
 - **High Performance**: Built on Starlette and Pydantic for speed and efficiency.
